@@ -43,6 +43,7 @@ func Register(c *gin.Context) {
 	user := models.User{
 		Email:    body.Email,
 		Password: string(hash),
+		Role:     []models.Role{{ID: 1}},
 	}
 
 	result := initializers.DB.Create(&user)
@@ -144,5 +145,92 @@ func Validate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": true,
 		"data":   user,
+	})
+}
+
+type MyData struct {
+	ID    uint   `json:"id"`
+	Email string `json:"email"`
+	Roles []uint `json:"roles"`
+}
+
+// func indexOfMyData(id uint, data []MyData) int {
+// 	for k, v := range data {
+// 		if id == v.ID {
+// 			return k
+// 		}
+// 	}
+
+// 	return -1
+// }
+
+// IndexOfB is a function to find index of an element in a slice of map
+func indexOfB(id uint, data []map[string]interface{}, variable string) int {
+	for k, v := range data {
+		if id == v[variable] {
+			return k
+		}
+	}
+
+	return -1
+}
+
+func ListUsers(c *gin.Context) {
+	// var users []models.User
+
+	type auser struct {
+		ID     uint   `json:"id"`
+		Email  string `json:"email"`
+		Name   string `json:"name"`
+		RoleID uint   `json:"role_id"`
+	}
+
+	var users []auser
+
+	result := initializers.DB.Model(&models.User{}).Select("users.id, users.email, users.name, user_roles.role_id").Joins("LEFT JOIN user_roles ON user_roles.user_id = users.id").Scan(&users)
+
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": false,
+			"error":  "Failed to get users",
+		})
+
+		return
+	}
+
+	// var testa = []MyData{}
+
+	// for _, value := range users {
+	// 	i := indexOfMyData(value.ID, testa)
+
+	// 	if i == -1 {
+	// 		testa = append(testa, MyData{
+	// 			ID:    value.ID,
+	// 			Email: value.Email,
+	// 			Roles: []uint{value.RoleID},
+	// 		})
+	// 	} else {
+	// 		testa[i].Roles = append(testa[i].Roles, value.RoleID)
+	// 	}
+	// }
+
+	var testb []map[string]interface{}
+
+	for _, value := range users {
+		i := indexOfB(value.ID, testb, "id")
+		if i == -1 {
+			testb = append(testb, map[string]interface{}{
+				"id":    value.ID,
+				"email": value.Email,
+				"roles": []uint{value.RoleID},
+			})
+		} else {
+			testb[i]["roles"] = append(testb[i]["roles"].([]uint), value.RoleID)
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": true,
+		"data":   testb,
 	})
 }
