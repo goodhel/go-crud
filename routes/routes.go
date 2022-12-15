@@ -12,6 +12,7 @@ func Routes() *gin.Engine {
 	router.POST("/register", controllers.Register)
 	router.POST("/login", controllers.Login)
 
+	// Grouping routes under path /api
 	api := router.Group("/api")
 	{
 		api.GET("/posts", controllers.ListPosts)
@@ -21,6 +22,7 @@ func Routes() *gin.Engine {
 		api.DELETE("/posts", controllers.DeletePost)
 		api.GET("/validate", middleware.UserSession, controllers.Validate)
 		api.GET("/users", middleware.UserSession, controllers.ListUsers)
+		api.POST("/file/upload", middleware.UserSession, controllers.UploadFile)
 	}
 
 	return router
