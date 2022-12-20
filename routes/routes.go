@@ -22,6 +22,7 @@ func Routes() *gin.Engine {
 		api.DELETE("/posts", controllers.DeletePost)
 		api.GET("/validate", middleware.UserSession, controllers.Validate)
 		api.GET("/users", middleware.UserSession, controllers.ListUsers)
+		api.GET("/file/:id", controllers.DonwloadFile)
 		api.POST("/file/upload", middleware.UserSession, controllers.UploadFile)
 	}
 

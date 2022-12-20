@@ -13,7 +13,9 @@ type FileUpload struct {
 	Mime         string         `gorm:"size:75;" json:"mime"`
 	Path         string         `gorm:"size:200;" json:"path"`
 	Extension    string         `gorm:"size:20;" json:"extension"`
+	UserID       uint           `json:"user_id"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+	WorkOrder    []DWorkOrder   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

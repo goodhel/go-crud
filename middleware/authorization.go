@@ -13,7 +13,6 @@ import (
 )
 
 func UserSession(c *gin.Context) {
-	fmt.Println("middleware")
 	// Get the cookie from request
 	tokenString, err := c.Cookie("Authorization")
 
