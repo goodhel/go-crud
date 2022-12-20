@@ -6,6 +6,7 @@ Learning Go Languange From Youtube With These Package
 4. [Gorm](https://gorm.io/index.html)
 5. [GolangJwt](https://github.com/golang-jwt/jwt)
 6. [Crypto](https://pkg.go.dev/golang.org/x/crypto)
+7. [Excelize](https://xuri.me/excelize/en/)
 
 ## Source Youtube Coding With Robby
 1. [Make a JSON CRUD API](https://www.youtube.com/watch?v=lf_kiH_NPvM)
