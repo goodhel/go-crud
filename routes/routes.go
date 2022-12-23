@@ -15,13 +15,19 @@ func Routes() *gin.Engine {
 	// Grouping routes under path /api
 	api := router.Group("/api")
 	{
+		// Posts
 		api.GET("/posts", controllers.ListPosts)
 		api.GET("/posts/:id", controllers.DetailPosts)
 		api.POST("/posts", controllers.PostsCreate)
 		api.PUT("/posts/:id", controllers.UpdatePost)
 		api.DELETE("/posts", controllers.DeletePost)
+
+		// User
 		api.GET("/validate", middleware.UserSession, controllers.Validate)
 		api.GET("/users", middleware.UserSession, controllers.ListUsers)
+		api.PUT("/users/:id", middleware.UserSession, controllers.UpdateUser)
+
+		// Upload File
 		api.GET("/file/:id", controllers.DonwloadFile)
 		api.POST("/file/upload", middleware.UserSession, controllers.UploadFile)
 	}

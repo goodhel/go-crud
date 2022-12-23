@@ -20,5 +20,7 @@ func main() {
 		})
 	})
 
+	router.Static("/public", "./public")
+
 	router.Run() // listen and serve on 0.0.0.0:8081
 }

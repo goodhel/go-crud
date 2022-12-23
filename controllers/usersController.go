@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -232,5 +234,80 @@ func ListUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": true,
 		"data":   testb,
+	})
+}
+
+func UpdateUser(c *gin.Context) {
+	id := c.Param("id")
+
+	// Check User
+	var user models.User
+	result := initializers.DB.First(&user, id)
+
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status": false,
+			"error":  "User not found",
+		})
+
+		return
+	}
+
+	fmt.Println("deteail user", user)
+
+	// Get File from Body
+	file, err := c.FormFile("file")
+
+	var fileName *string
+
+	if err == nil {
+		s := strings.Split(file.Filename, ".")
+		ext := s[len(s)-1]
+		randName := fmt.Sprintf("%v", time.Now().UnixMilli()) + "_file." + ext
+
+		if err := c.SaveUploadedFile(file, "./public/"+randName); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status": false,
+				"error":  err.Error(),
+			})
+			return
+		}
+
+		filepath := "http://localhost:8080" + "/public/" + randName
+		fileName = &filepath
+
+		// Delete Old File
+		av := strings.Split(*user.Avatar, "/")
+		oldFile := "./public/" + av[len(av)-1]
+		os.Remove(oldFile)
+	} else {
+		fileName = nil
+	}
+
+	// Get Data from Body
+	var body struct {
+		Name string `form:"name";json:"name"`
+	}
+
+	c.Bind(&body)
+
+	var input struct {
+		Name   string  `json:"name"`
+		Avatar *string `json:"avatar"`
+	}
+
+	input.Name = body.Name
+	input.Avatar = fileName
+
+	// Update User
+	initializers.DB.Model(&user).Updates(models.User{
+		Name:   input.Name,
+		Avatar: input.Avatar,
+	})
+
+	// Return Response
+	c.JSON(http.StatusOK, gin.H{
+		"status": true,
+		"data":   user,
 	})
 }
